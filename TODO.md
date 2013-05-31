@@ -1,5 +1,5 @@
-bjdean.is.au/gonetcheck TODO
-============================
+github.com/bjdean/gonetcheck TODO
+=================================
 
 Wed May 29 14:13:24 EST 2013
 ----------------------------
