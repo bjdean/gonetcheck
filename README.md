@@ -8,7 +8,7 @@ Synopsis
 
 	import "github.com/bjdean/gonetcheck"
 	
-	can_access_internet, err := CheckInternetAccess()
+	can_access_internet, err := gonetcheck.CheckInternetAccess()
 	
 	if can_access_internet {
 		// Do something requiring internet access
