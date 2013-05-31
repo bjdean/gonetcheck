@@ -6,13 +6,13 @@ go package for checking general network health
 Synopsis
 --------
 
-import "github.com/bjdean/gonetcheck"
-
-can_access_internet, err := CheckInternetAccess()
-
-if can_access_internet {
-	// Do something requiring internet access
-}
+	import "github.com/bjdean/gonetcheck"
+	
+	can_access_internet, err := CheckInternetAccess()
+	
+	if can_access_internet {
+		// Do something requiring internet access
+	}
 
 
 License
