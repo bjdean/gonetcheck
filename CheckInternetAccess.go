@@ -25,19 +25,6 @@ import (
 	"time"
 )
 
-// A set of default test URLs used to check
-// remote network access
-var test_urls = []string{
-	"http://www.google.com/",
-	"http://www.bing.com/",
-	"http://www.microsoft.com/",
-	"http://www.apple.com/",
-	"http://github.com/",
-	"http://yahoo.com/",
-	"http://www.unimelb.edu.au/",
-	"http://abc.net.au/",
-}
-
 // Determine if it looks like this server has access
 // to the internet (ie remote servers)
 // TODO Implement error checks and return errors

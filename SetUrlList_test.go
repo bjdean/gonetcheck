@@ -3,7 +3,7 @@ package gonetcheck
 /*********************************************************************
  * Testing: gonetcheck - Go package to check general network health
  *
- * func: CheckInternetAccess
+ * func: SetUrlList
  *
  * Copyright 2013 Bradley Dean
  *
@@ -23,30 +23,40 @@ package gonetcheck
 
 import (
 	"testing"
-	"os"
-	"fmt"
 )
 
-func TestCheckInternetAccess (t *testing.T) {
-	_, err := CheckInternetAccess()
-	if ( err != nil ) {
-		t.Error("Error received:", err)
+func TestSetUrlListValid (t *testing.T) {
+	var new_urls = []string{
+		"http://example.com/",
+		"http://example.net/",
+	}
+	err_list := SetUrlList(new_urls)
+	if err_list != nil {
+		t.Error("Valid URL list had failures:", err_list)
 	}
 }
 
-func ExampleCheckInternetAccess () {
-	can_access_internet, err := CheckInternetAccess()
-	switch err {
-		case nil:
-			switch can_access_internet {
-				case true: os.Exit(0)
-				default: os.Exit(1)
-			}
-		default:
-			fmt.Println(
-				"Error returned by CheckInternetAccess:",
-				err)
-			os.Exit(2)
+func TestSetUrlListInvalid (t *testing.T) {
+	var new_urls = []string{
+		"http://example.com/",
+		"http://example.net/",
+		"%xx%xx",
+		"%zz%zz",
+	}
+	err_list := SetUrlList(new_urls)
+	if len(err_list) != 2 {
+		t.Error("Invalid URLs not detected:", new_urls)
+	}
+}
+
+func ExampleSetUrlList () {
+	var new_urls = []string{
+		"http://example.com/",
+		"http://example.net/",
+	}
+	err_list := SetUrlList(new_urls)
+	if err_list != nil {
+		// Handle problem with URLs
 	}
 	// Output:
 }
