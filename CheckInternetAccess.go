@@ -27,8 +27,7 @@ import (
 
 // Determine if it looks like this server has access
 // to the internet (ie remote servers)
-// TODO Implement error checks and return errors
-func CheckInternetAccess () (bool, error) {
+func CheckInternetAccess () (bool, []error) {
 	// This entire function has a timeout starting
 	// when the function is called
 	timeout_chan := time.After(2 * time.Second)
@@ -53,13 +52,20 @@ func CheckInternetAccess () (bool, error) {
 	// Check results
 	test_count := len(test_urls)
 	var success_count int
+	var err_list []error
 	for _, stat := range stats {
 		debug_log(DBG_MEDIUM, stat)
-		if ( stat.Error == nil &&
-			stat.ResponseCode < 400 ) {
-			success_count += 1
+		switch stat.Error {
+			case nil:
+				if stat.ResponseCode < 400 {
+					success_count += 1
+				}
+			default:
+				err_list = append(err_list, stat.Error)
 		}
 	}
+
+	// Calculate network_is_up
 	up_fraction := float32(success_count)/float32(test_count)
 	var network_is_up bool
 	if up_fraction >= 0.5 {
@@ -69,5 +75,5 @@ func CheckInternetAccess () (bool, error) {
 	debug_log(DBG_QUIET, "Network is up:", network_is_up)
 
 	// Return true if network_is_up
-	return network_is_up, nil
+	return network_is_up, err_list
 }

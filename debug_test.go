@@ -25,46 +25,56 @@ import (
 	"testing"
 )
 
+// XXX Make sure to reset DEBUG_DEFAULT after each test
+
 func TestDebugLogOff (t *testing.T) {
 	DEBUG = DBG_OFF
 	debug_log(DBG_QUIET, "hello", "there")
+	DEBUG = DEBUG_DEFAULT
 }
 
 func TestDebugLogQuiet (t *testing.T) {
 	DEBUG = DBG_QUIET
 	debug_log(DBG_QUIET, "hello", "there")
+	DEBUG = DEBUG_DEFAULT
 }
 
 func TestDebugLogMedium (t *testing.T) {
 	DEBUG = DBG_MEDIUM
 	debug_log(DBG_QUIET, "hello", "there")
+	DEBUG = DEBUG_DEFAULT
 }
 
 func TestDebugLogVerbose (t *testing.T) {
 	DEBUG = DBG_VERBOSE
 	debug_log(DBG_QUIET, "hello", "there")
+	DEBUG = DEBUG_DEFAULT
 }
 
 func ExampleTestDebugLogOff () {
 	DEBUG = DBG_OFF
 	debug_log(DBG_QUIET, "hello", "there")
+	DEBUG = DEBUG_DEFAULT
 	// Output:
 }
 
 func ExampleDebugLogQuiet () {
 	DEBUG = DBG_QUIET
 	debug_log(DBG_QUIET, "hello", "there")
+	DEBUG = DEBUG_DEFAULT
 	// Output:
 }
 
 func ExampleDebugLogMedium () {
 	DEBUG = DBG_MEDIUM
 	debug_log(DBG_QUIET, "hello", "there")
+	DEBUG = DEBUG_DEFAULT
 	// Output:
 }
 
 func ExampleDebugLogVerbose () {
 	DEBUG = DBG_VERBOSE
 	debug_log(DBG_QUIET, "hello", "there")
+	DEBUG = DEBUG_DEFAULT
 	// Output:
 }

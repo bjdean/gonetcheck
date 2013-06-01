@@ -30,7 +30,13 @@ func TestSetUrlListValid (t *testing.T) {
 		"http://example.com/",
 		"http://example.net/",
 	}
+	old_urls := GetUrlList()
+
 	err_list := SetUrlList(new_urls)
+
+	// Reset url list (avoid side-effects on other tests)
+	SetUrlList(old_urls)
+
 	if err_list != nil {
 		t.Error("Valid URL list had failures:", err_list)
 	}
@@ -43,7 +49,13 @@ func TestSetUrlListInvalid (t *testing.T) {
 		"%xx%xx",
 		"%zz%zz",
 	}
+	old_urls := GetUrlList()
+
 	err_list := SetUrlList(new_urls)
+
+	// Reset url list (avoid side-effects on other tests)
+	SetUrlList(old_urls)
+
 	if len(err_list) != 2 {
 		t.Error("Invalid URLs not detected:", new_urls)
 	}
