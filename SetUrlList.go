@@ -32,10 +32,11 @@ var test_urls = []string{
 	"http://www.bing.com/",
 	"http://www.microsoft.com/",
 	"http://www.apple.com/",
-	"http://github.com/",
 	"http://yahoo.com/",
 	"http://www.unimelb.edu.au/",
 	"http://abc.net.au/",
+	"http://www.monash.edu.au/",
+	"http://bbb.co.uk/",
 }
 
 // Change the test URL list
