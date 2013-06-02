@@ -4,14 +4,14 @@ package gonetcheck
  * Testing: gonetcheck - Go package to check general network health
  *
  * Debugging
- * 
+ *
  * Copyright 2013 Bradley Dean
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -27,52 +27,52 @@ import (
 
 // XXX Make sure to reset DEBUG_DEFAULT after each test
 
-func TestDebugLogOff (t *testing.T) {
+func TestDebugLogOff(t *testing.T) {
 	DEBUG = DBG_OFF
 	debug_log(DBG_QUIET, "hello", "there")
 	DEBUG = DEBUG_DEFAULT
 }
 
-func TestDebugLogQuiet (t *testing.T) {
+func TestDebugLogQuiet(t *testing.T) {
 	DEBUG = DBG_QUIET
 	debug_log(DBG_QUIET, "hello", "there")
 	DEBUG = DEBUG_DEFAULT
 }
 
-func TestDebugLogMedium (t *testing.T) {
+func TestDebugLogMedium(t *testing.T) {
 	DEBUG = DBG_MEDIUM
 	debug_log(DBG_QUIET, "hello", "there")
 	DEBUG = DEBUG_DEFAULT
 }
 
-func TestDebugLogVerbose (t *testing.T) {
+func TestDebugLogVerbose(t *testing.T) {
 	DEBUG = DBG_VERBOSE
 	debug_log(DBG_QUIET, "hello", "there")
 	DEBUG = DEBUG_DEFAULT
 }
 
-func ExampleTestDebugLogOff () {
+func ExampleTestDebugLogOff() {
 	DEBUG = DBG_OFF
 	debug_log(DBG_QUIET, "hello", "there")
 	DEBUG = DEBUG_DEFAULT
 	// Output:
 }
 
-func ExampleDebugLogQuiet () {
+func ExampleDebugLogQuiet() {
 	DEBUG = DBG_QUIET
 	debug_log(DBG_QUIET, "hello", "there")
 	DEBUG = DEBUG_DEFAULT
 	// Output:
 }
 
-func ExampleDebugLogMedium () {
+func ExampleDebugLogMedium() {
 	DEBUG = DBG_MEDIUM
 	debug_log(DBG_QUIET, "hello", "there")
 	DEBUG = DEBUG_DEFAULT
 	// Output:
 }
 
-func ExampleDebugLogVerbose () {
+func ExampleDebugLogVerbose() {
 	DEBUG = DBG_VERBOSE
 	debug_log(DBG_QUIET, "hello", "there")
 	DEBUG = DEBUG_DEFAULT

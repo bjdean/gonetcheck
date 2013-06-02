@@ -11,7 +11,7 @@ package gonetcheck
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -26,16 +26,16 @@ import (
 	"time"
 )
 
-func TestCheckUrl (t *testing.T) {
-	output_queue  := make(chan UrlStat)
+func TestCheckUrl(t *testing.T) {
+	output_queue := make(chan UrlStat)
 	go check_url("http://www.google.com/", output_queue)
 
 	select {
-		case stat := <-output_queue:
-			if stat.ResponseCode == 0 && stat.Error == nil {
-				t.Error("stat invalid - had neither ResponseCode nor Error")
-			}
-		case <-time.After(20 * time.Second):
-			t.Error("No response received after 20s")
+	case stat := <-output_queue:
+		if stat.ResponseCode == 0 && stat.Error == nil {
+			t.Error("stat invalid - had neither ResponseCode nor Error")
+		}
+	case <-time.After(20 * time.Second):
+		t.Error("No response received after 20s")
 	}
 }

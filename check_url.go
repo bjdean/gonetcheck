@@ -11,7 +11,7 @@ package gonetcheck
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -27,28 +27,28 @@ import (
 
 // Status of a URL check
 type UrlStat struct {
-	Url string
+	Url          string
 	ResponseCode int
-	StatusLine string
-	Error error
+	StatusLine   string
+	Error        error
 }
 
 // Make a single URL request and pass a UrlStat into
 // the out_queue channel
-func check_url (url string, out_queue chan UrlStat) {
+func check_url(url string, out_queue chan UrlStat) {
 	debug_log(DBG_MEDIUM, "check_url: ", url)
 	resp, err := http.Head(url)
 	if err == nil {
 		debug_log(DBG_VERBOSE, "check_url success:", resp)
 		out_queue <- UrlStat{
-			Url: url,
+			Url:          url,
 			ResponseCode: resp.StatusCode,
-			StatusLine: resp.Status,
+			StatusLine:   resp.Status,
 		}
 	} else {
 		debug_log(DBG_VERBOSE, "check_url error: ", err)
 		out_queue <- UrlStat{
-			Url: url,
+			Url:   url,
 			Error: err,
 		}
 	}

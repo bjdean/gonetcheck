@@ -11,7 +11,7 @@ package gonetcheck
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -39,13 +39,13 @@ var test_urls = []string{
 }
 
 // Change the test URL list
-func GetUrlList () ([]string) {
+func GetUrlList() []string {
 	return test_urls
 }
 
 // Update the test URL list
 // Valide that the array of strings contains parseable URLs
-func SetUrlList (new_url_list []string) ([]error) {
+func SetUrlList(new_url_list []string) []error {
 	var err_list []error
 	for _, url_string := range new_url_list {
 		_, err := url.Parse(url_string)

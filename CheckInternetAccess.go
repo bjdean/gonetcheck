@@ -11,7 +11,7 @@ package gonetcheck
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -27,7 +27,7 @@ import (
 
 // Determine if it looks like this server has access
 // to the internet (ie remote servers)
-func CheckInternetAccess () (bool, []error) {
+func CheckInternetAccess() (bool, []error) {
 	// This entire function has a timeout starting
 	// when the function is called
 	timeout_chan := time.After(2 * time.Second)
@@ -37,15 +37,16 @@ func CheckInternetAccess () (bool, []error) {
 	}
 
 	var stats []UrlStat
-	StatLoop: for {
+StatLoop:
+	for {
 		select {
-			case s := <-out_queue:
-				stats = append(stats, s)
-				if len(stats) == len(test_urls) {
-					break StatLoop
-				}
-			case <-timeout_chan:
+		case s := <-out_queue:
+			stats = append(stats, s)
+			if len(stats) == len(test_urls) {
 				break StatLoop
+			}
+		case <-timeout_chan:
+			break StatLoop
 		}
 	}
 
@@ -56,17 +57,17 @@ func CheckInternetAccess () (bool, []error) {
 	for _, stat := range stats {
 		debug_log(DBG_MEDIUM, stat)
 		switch stat.Error {
-			case nil:
-				if stat.ResponseCode < 400 {
-					success_count += 1
-				}
-			default:
-				err_list = append(err_list, stat.Error)
+		case nil:
+			if stat.ResponseCode < 400 {
+				success_count += 1
+			}
+		default:
+			err_list = append(err_list, stat.Error)
 		}
 	}
 
 	// Calculate network_is_up
-	up_fraction := float32(success_count)/float32(test_count)
+	up_fraction := float32(success_count) / float32(test_count)
 	var network_is_up bool
 	if up_fraction >= 0.5 {
 		network_is_up = true

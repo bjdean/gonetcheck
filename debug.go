@@ -2,7 +2,7 @@ package gonetcheck
 
 /*********************************************************************
  * gonetcheck - Go package to check general network health
- * 
+ *
  * Debugging
  *
  * Copyright 2013 Bradley Dean
@@ -11,7 +11,7 @@ package gonetcheck
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -32,12 +32,13 @@ const (
 	DBG_MEDIUM
 	DBG_VERBOSE
 )
+
 var DEBUG int = DBG_OFF
 var DEBUG_DEFAULT int = DEBUG
 
 // Debug logging
 func debug_log(debug_level int, a ...interface{}) {
-	if ( DEBUG >= debug_level ) {
+	if DEBUG >= debug_level {
 		log.Println(a...)
 	}
 }
