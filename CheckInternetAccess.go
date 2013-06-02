@@ -30,25 +30,125 @@ import (
 func CheckInternetAccess() (bool, []error) {
 	// This entire function has a timeout starting
 	// when the function is called
-	timeout_chan := time.After(2 * time.Second)
-	out_queue := make(chan UrlStat)
+	timeout_chan := time.After(5 * time.Second)
+
+	// All checking goroutines:
+	// 1. Register thei existence (ie number of checks) by dropping an int
+	//    onto check_count_chan channel
+	// 2. Drop either a result or an error onto the result_chan or
+	//    error_chan channels
+	// result_chan and error_chan channels are buffered to allow the check
+	// goroutines to be cleaned up
+	check_count_chan := make(chan int, 100)
+	result_chan := make(chan bool, 100)
+	error_chan := make(chan error, 100)
+
+	// Finally the end-result will be placed on these channels
+	final_result_chan := make(chan bool)
+	final_error_chan := make(chan []error)
+
+	// The final_result_check channel acculates and finally
+	// calculates the final result
+	go final_result_check(
+		timeout_chan,
+		check_count_chan,
+		result_chan,
+		error_chan,
+		final_result_chan,
+		final_error_chan)
+
+	// Run checking goroutines
+	go run_url_checks(check_count_chan, result_chan, error_chan)
+
+	// Block until the final_result_chan receives a value
+	return <-final_result_chan, <-final_error_chan
+}
+
+// Run all check_url checks and transpose UrlStat responses into
+// the result/error channels
+func run_url_checks(
+	check_count_chan chan int,
+	result_chan chan bool,
+	error_chan chan error) {
+
+	check_url_chan := make(chan UrlStat, 100)
+
+	// Launch checks
 	for _, url := range test_urls {
-		go check_url(url, out_queue)
+		go check_url(url, check_url_chan)
+		check_count_chan <- 1
 	}
 
-	var stats []UrlStat
-StatLoop:
+	// Process results into the result_chan
 	for {
-		select {
-		case s := <-out_queue:
-			stats = append(stats, s)
-			if len(stats) == len(test_urls) {
-				break StatLoop
+		stat := <-check_url_chan
+		switch stat.Error {
+		case nil:
+			if stat.ResponseCode < 400 {
+				result_chan <- true
 			}
-		case <-timeout_chan:
-			break StatLoop
+		default:
+			error_chan <- stat.Error
 		}
 	}
+}
+
+// Collate errors and results from the result_chan and error_chan until the
+// timeout_chan fires. Once this occurs calculate the final result/error and
+// place it on the final_result_chan or the final_error_chan
+func final_result_check(
+	timeout_chan <-chan time.Time,
+	check_count_chan chan int,
+	result_chan chan bool,
+	error_chan chan error,
+	final_result_chan chan bool,
+	final_error_chan chan []error) {
+
+	// Accumulators
+	var check_count int
+	var success_count int
+	var fail_count int
+	var errors []error
+
+AccumulatorLoop:
+	for {
+		select {
+		case count := <-check_count_chan:
+			check_count += count
+		case result := <-result_chan:
+			switch result {
+				case true: success_count += 1
+				default: fail_count += 1
+			}
+			// If all checks are in, break
+			if success_count + fail_count + len(errors) >= check_count {
+				break AccumulatorLoop
+			}
+		case err := <-error_chan:
+			errors = append(errors, err)
+			// If all checks are in, break
+			if success_count + fail_count + len(errors) >= check_count {
+				break AccumulatorLoop
+			}
+		case <-timeout_chan:
+			break AccumulatorLoop
+		}
+	}
+
+	// Calculate the final result
+	switch errors {
+	case nil:
+		up_fraction := float32(success_count) / float32(check_count)
+		final_result_chan <- up_fraction >= 0.5
+		final_error_chan <- nil
+	default:
+		final_result_chan <- false
+		final_error_chan <- errors
+	}
+}
+
+/*************************************************************
+ * refactoring:
 
 	// Check results
 	test_count := len(test_urls)
@@ -78,3 +178,6 @@ StatLoop:
 	// Return true if network_is_up
 	return network_is_up, err_list
 }
+
+
+*********************************************************************/
