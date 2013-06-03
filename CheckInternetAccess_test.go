@@ -28,14 +28,20 @@ import (
 )
 
 func TestCheckInternetAccess(t *testing.T) {
-	_, errList := CheckInternetAccess()
+	_, errList := CheckInternetAccess(
+		[]string{ "http://www.google.com/", "http://www.unimelb.edu.au/" },
+		[]string{ "www.google.com:80", "www.google.com:443" },
+	)
 	if errList != nil {
 		t.Error("Error received:", errList)
 	}
 }
 
 func ExampleCheckInternetAccess() {
-	canAccessInternet, errList := CheckInternetAccess()
+	canAccessInternet, errList := CheckInternetAccess(
+		[]string{ "http://www.google.com/", "http://www.unimelb.edu.au/" },
+		[]string{ "www.google.com:80", "www.google.com:443" },
+	)
 	switch errList {
 	case nil:
 		switch canAccessInternet {

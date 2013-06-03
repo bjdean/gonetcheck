@@ -33,7 +33,7 @@ type finalResult struct {
 
 // Determine if it looks like this server has access
 // to the internet (ie remote servers)
-func CheckInternetAccess() (bool, []error) {
+func CheckInternetAccess(testUrls, testTcpAddrs []string) (bool, []error) {
 	// This entire function has a timeout starting
 	// when the function is called
 	timeoutChan := time.After(10 * time.Second)
@@ -62,7 +62,8 @@ func CheckInternetAccess() (bool, []error) {
 		finalResultChan)
 
 	// Run checking goroutines
-	go runUrlChecks(checkCountChan, resultChan, errorChan)
+	go runUrlChecks(testUrls, checkCountChan, resultChan, errorChan)
+	go runTcpChecks(testTcpAddrs, checkCountChan, resultChan, errorChan)
 
 	// Block until the finalResultChan receives a value
 	finalResult := <-finalResultChan
@@ -72,6 +73,7 @@ func CheckInternetAccess() (bool, []error) {
 // Run all checkUrl checks and transpose UrlStat responses into
 // the result/error channels
 func runUrlChecks(
+	testUrls []string,
 	checkCountChan chan int,
 	resultChan chan bool,
 	errorChan chan error) {
@@ -94,6 +96,32 @@ func runUrlChecks(
 			}
 		default:
 			errorChan <- stat.Error
+		}
+	}
+}
+
+func runTcpChecks(
+	testTcpAddrs []string,
+	checkCountChan chan int,
+	resultChan chan bool,
+	errorChan chan error) {
+
+	checkTcpChan := make(chan error, 100)
+
+	// Launch checks
+	for _, addr := range testTcpAddrs {
+		go checkTcp(addr, checkTcpChan)
+		checkCountChan <- 1
+	}
+
+	// Process results into the resultChan
+	for {
+		err := <-checkTcpChan
+		switch err {
+		case nil:
+			resultChan <- true
+		default:
+			errorChan <- err
 		}
 	}
 }
@@ -157,38 +185,3 @@ AccumulatorLoop:
 		finalResultChan <- finalResult{false, errors}
 	}
 }
-
-/*************************************************************
- * refactoring:
-
-	// Check results
-	testCount := len(testUrls)
-	var successCount int
-	var errList []error
-	for _, stat := range stats {
-		debugLog(DBG_MEDIUM, stat)
-		switch stat.Error {
-		case nil:
-			if stat.ResponseCode < 400 {
-				successCount += 1
-			}
-		default:
-			errList = append(errList, stat.Error)
-		}
-	}
-
-	// Calculate networkIsUp
-	upFraction := float32(successCount) / float32(testCount)
-	var networkIsUp bool
-	if upFraction >= 0.5 {
-		networkIsUp = true
-	}
-	debugLog(DBG_QUIET, "Sites up fraction:", upFraction)
-	debugLog(DBG_QUIET, "Network is up:", networkIsUp)
-
-	// Return true if networkIsUp
-	return networkIsUp, errList
-}
-
-
-*********************************************************************/
