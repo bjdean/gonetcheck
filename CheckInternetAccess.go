@@ -139,7 +139,7 @@ AccumulatorLoop:
 		case <-timeout_chan:
 			break AccumulatorLoop
 		}
-		debug_log(
+		debugLog(
 			DBG_VERBOSE,
 			"CheckCount = ", check_count, ";",
 			"SuccessCount =", success_count, ";",
@@ -166,7 +166,7 @@ AccumulatorLoop:
 	var success_count int
 	var err_list []error
 	for _, stat := range stats {
-		debug_log(DBG_MEDIUM, stat)
+		debugLog(DBG_MEDIUM, stat)
 		switch stat.Error {
 		case nil:
 			if stat.ResponseCode < 400 {
@@ -183,8 +183,8 @@ AccumulatorLoop:
 	if up_fraction >= 0.5 {
 		network_is_up = true
 	}
-	debug_log(DBG_QUIET, "Sites up fraction:", up_fraction)
-	debug_log(DBG_QUIET, "Network is up:", network_is_up)
+	debugLog(DBG_QUIET, "Sites up fraction:", up_fraction)
+	debugLog(DBG_QUIET, "Network is up:", network_is_up)
 
 	// Return true if network_is_up
 	return network_is_up, err_list

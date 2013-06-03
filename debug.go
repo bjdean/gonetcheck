@@ -37,7 +37,7 @@ var DEBUG int = DBG_OFF
 var DEBUG_DEFAULT int = DEBUG
 
 // Debug logging
-func debug_log(debug_level int, a ...interface{}) {
+func debugLog(debug_level int, a ...interface{}) {
 	if DEBUG >= debug_level {
 		log.Println(a...)
 	}
