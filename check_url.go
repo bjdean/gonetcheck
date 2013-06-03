@@ -39,7 +39,7 @@ func check_url(url string, out_queue chan UrlStat) {
 	debug_log(DBG_MEDIUM, "check_url: ", url)
 	resp, err := http.Head(url)
 	if err == nil {
-		debug_log(DBG_VERBOSE, "check_url success:", resp)
+		debug_log(DBG_VERBOSE, "check_url success:", url, resp)
 		out_queue <- UrlStat{
 			Url:          url,
 			ResponseCode: resp.StatusCode,

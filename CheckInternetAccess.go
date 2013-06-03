@@ -25,12 +25,18 @@ import (
 	"time"
 )
 
+// The final result to be put on the final_result_chan
+type finalResult struct {
+	NetworkIsUp bool
+	Errors []error
+}
+
 // Determine if it looks like this server has access
 // to the internet (ie remote servers)
 func CheckInternetAccess() (bool, []error) {
 	// This entire function has a timeout starting
 	// when the function is called
-	timeout_chan := time.After(5 * time.Second)
+	timeout_chan := time.After(10 * time.Second)
 
 	// All checking goroutines:
 	// 1. Register thei existence (ie number of checks) by dropping an int
@@ -44,8 +50,7 @@ func CheckInternetAccess() (bool, []error) {
 	error_chan := make(chan error, 100)
 
 	// Finally the end-result will be placed on these channels
-	final_result_chan := make(chan bool)
-	final_error_chan := make(chan []error)
+	final_result_chan := make(chan finalResult)
 
 	// The final_result_check channel acculates and finally
 	// calculates the final result
@@ -54,14 +59,14 @@ func CheckInternetAccess() (bool, []error) {
 		check_count_chan,
 		result_chan,
 		error_chan,
-		final_result_chan,
-		final_error_chan)
+		final_result_chan)
 
 	// Run checking goroutines
 	go run_url_checks(check_count_chan, result_chan, error_chan)
 
 	// Block until the final_result_chan receives a value
-	return <-final_result_chan, <-final_error_chan
+	final_result := <-final_result_chan
+	return final_result.NetworkIsUp, final_result.Errors
 }
 
 // Run all check_url checks and transpose UrlStat responses into
@@ -94,15 +99,14 @@ func run_url_checks(
 }
 
 // Collate errors and results from the result_chan and error_chan until the
-// timeout_chan fires. Once this occurs calculate the final result/error and
-// place it on the final_result_chan or the final_error_chan
+// timeout_chan fires. Once this occurs calculate the final result and
+// place it on the final_result_chan
 func final_result_check(
 	timeout_chan <-chan time.Time,
 	check_count_chan chan int,
 	result_chan chan bool,
 	error_chan chan error,
-	final_result_chan chan bool,
-	final_error_chan chan []error) {
+	final_result_chan chan finalResult) {
 
 	// Accumulators
 	var check_count int
@@ -133,17 +137,22 @@ AccumulatorLoop:
 		case <-timeout_chan:
 			break AccumulatorLoop
 		}
+		debug_log(
+			DBG_VERBOSE,
+			"CheckCount = ", check_count, ";",
+			"SuccessCount =", success_count, ";",
+			"FailCount = ", fail_count, ";",
+			"Errors = ", errors, ";",
+		)
 	}
 
 	// Calculate the final result
 	switch errors {
 	case nil:
 		up_fraction := float32(success_count) / float32(check_count)
-		final_result_chan <- up_fraction >= 0.5
-		final_error_chan <- nil
+		final_result_chan <- finalResult{ up_fraction >= 0.5, nil }
 	default:
-		final_result_chan <- false
-		final_error_chan <- errors
+		final_result_chan <- finalResult{ false, errors }
 	}
 }
 
