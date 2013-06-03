@@ -39,3 +39,47 @@ func TestChecktcp(t *testing.T) {
 		t.Error("No response received after 20s")
 	}
 }
+
+func TestChecktcpBadAddr(t *testing.T) {
+	outputQueue := make(chan error)
+	go checkTcp("!~£$:80", outputQueue)
+
+	select {
+	case err := <-outputQueue:
+		if err == nil {
+			t.Error("expected hostname error for !~£$:80")
+		}
+	case <-time.After(20 * time.Second):
+		t.Error("No response received after 20s")
+	}
+}
+
+func TestChecktcpBadPort(t *testing.T) {
+	outputQueue := make(chan error)
+	go checkTcp("www.google.com:zz", outputQueue)
+
+	select {
+	case err := <-outputQueue:
+		if err == nil {
+			t.Error("expected port error for www.google.com:zz")
+		}
+	case <-time.After(20 * time.Second):
+		t.Error("No response received after 20s")
+	}
+}
+
+// This might accidentally succeed if something
+// happens to have the 'invalid' port open
+func TestChecktcpClosedPort(t *testing.T) {
+	outputQueue := make(chan error)
+	go checkTcp("localhost:45234", outputQueue)
+
+	select {
+	case err := <-outputQueue:
+		if err == nil {
+			t.Error("expected port closed for localhost:45234")
+		}
+	case <-time.After(20 * time.Second):
+		t.Error("No response received after 20s")
+	}
+}
