@@ -69,24 +69,24 @@ func CheckInternetAccess() (bool, []error) {
 	return final_result.NetworkIsUp, final_result.Errors
 }
 
-// Run all check_url checks and transpose UrlStat responses into
+// Run all checkUrl checks and transpose UrlStat responses into
 // the result/error channels
 func run_url_checks(
 	check_count_chan chan int,
 	result_chan chan bool,
 	error_chan chan error) {
 
-	check_url_chan := make(chan UrlStat, 100)
+	checkUrlChan := make(chan UrlStat, 100)
 
 	// Launch checks
 	for _, url := range test_urls {
-		go check_url(url, check_url_chan)
+		go checkUrl(url, checkUrlChan)
 		check_count_chan <- 1
 	}
 
 	// Process results into the result_chan
 	for {
-		stat := <-check_url_chan
+		stat := <-checkUrlChan
 		switch stat.Error {
 		case nil:
 			if stat.ResponseCode < 400 {
