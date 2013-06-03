@@ -26,48 +26,48 @@ import (
 )
 
 func TestSetUrlListValid(t *testing.T) {
-	var new_urls = []string{
+	var newUrls = []string{
 		"http://example.com/",
 		"http://example.net/",
 	}
-	old_urls := GetUrlList()
+	oldUrls := GetUrlList()
 
-	err_list := SetUrlList(new_urls)
+	errList := SetUrlList(newUrls)
 
 	// Reset url list (avoid side-effects on other tests)
-	SetUrlList(old_urls)
+	SetUrlList(oldUrls)
 
-	if err_list != nil {
-		t.Error("Valid URL list had failures:", err_list)
+	if errList != nil {
+		t.Error("Valid URL list had failures:", errList)
 	}
 }
 
 func TestSetUrlListInvalid(t *testing.T) {
-	var new_urls = []string{
+	var newUrls = []string{
 		"http://example.com/",
 		"http://example.net/",
 		"%xx%xx",
 		"%zz%zz",
 	}
-	old_urls := GetUrlList()
+	oldUrls := GetUrlList()
 
-	err_list := SetUrlList(new_urls)
+	errList := SetUrlList(newUrls)
 
 	// Reset url list (avoid side-effects on other tests)
-	SetUrlList(old_urls)
+	SetUrlList(oldUrls)
 
-	if len(err_list) != 2 {
-		t.Error("Invalid URLs not detected:", new_urls)
+	if len(errList) != 2 {
+		t.Error("Invalid URLs not detected:", newUrls)
 	}
 }
 
 func ExampleSetUrlList() {
-	var new_urls = []string{
+	var newUrls = []string{
 		"http://example.com/",
 		"http://example.net/",
 	}
-	err_list := SetUrlList(new_urls)
-	if err_list != nil {
+	errList := SetUrlList(newUrls)
+	if errList != nil {
 		// Handle problem with URLs
 	}
 	// Output:

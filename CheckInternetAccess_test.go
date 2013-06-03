@@ -28,17 +28,17 @@ import (
 )
 
 func TestCheckInternetAccess(t *testing.T) {
-	_, err_list := CheckInternetAccess()
-	if err_list != nil {
-		t.Error("Error received:", err_list)
+	_, errList := CheckInternetAccess()
+	if errList != nil {
+		t.Error("Error received:", errList)
 	}
 }
 
 func ExampleCheckInternetAccess() {
-	can_access_internet, err_list := CheckInternetAccess()
-	switch err_list {
+	canAccessInternet, errList := CheckInternetAccess()
+	switch errList {
 	case nil:
-		switch can_access_internet {
+		switch canAccessInternet {
 		case true:
 			os.Exit(0)
 		default:
@@ -47,7 +47,7 @@ func ExampleCheckInternetAccess() {
 	default:
 		fmt.Println(
 			"Error returned by CheckInternetAccess:",
-			err_list)
+			errList)
 		// Would usually os.Exit(2)
 		// But to avoid upsetting go test exit with 0
 		os.Exit(0)

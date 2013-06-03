@@ -25,7 +25,7 @@ import (
 	"time"
 )
 
-// The final result to be put on the final_result_chan
+// The final result to be put on the finalResultChan
 type finalResult struct {
 	NetworkIsUp bool
 	Errors      []error
@@ -36,114 +36,114 @@ type finalResult struct {
 func CheckInternetAccess() (bool, []error) {
 	// This entire function has a timeout starting
 	// when the function is called
-	timeout_chan := time.After(10 * time.Second)
+	timeoutChan := time.After(10 * time.Second)
 
 	// All checking goroutines:
 	// 1. Register thei existence (ie number of checks) by dropping an int
-	//    onto check_count_chan channel
-	// 2. Drop either a result or an error onto the result_chan or
-	//    error_chan channels
-	// result_chan and error_chan channels are buffered to allow the check
+	//    onto checkCountChan channel
+	// 2. Drop either a result or an error onto the resultChan or
+	//    errorChan channels
+	// resultChan and errorChan channels are buffered to allow the check
 	// goroutines to be cleaned up
-	check_count_chan := make(chan int, 100)
-	result_chan := make(chan bool, 100)
-	error_chan := make(chan error, 100)
+	checkCountChan := make(chan int, 100)
+	resultChan := make(chan bool, 100)
+	errorChan := make(chan error, 100)
 
 	// Finally the end-result will be placed on these channels
-	final_result_chan := make(chan finalResult)
+	finalResultChan := make(chan finalResult)
 
-	// The final_result_check channel acculates and finally
+	// The finalResultCheck channel acculates and finally
 	// calculates the final result
-	go final_result_check(
-		timeout_chan,
-		check_count_chan,
-		result_chan,
-		error_chan,
-		final_result_chan)
+	go finalResultCheck(
+		timeoutChan,
+		checkCountChan,
+		resultChan,
+		errorChan,
+		finalResultChan)
 
 	// Run checking goroutines
-	go run_url_checks(check_count_chan, result_chan, error_chan)
+	go runUrlChecks(checkCountChan, resultChan, errorChan)
 
-	// Block until the final_result_chan receives a value
-	final_result := <-final_result_chan
-	return final_result.NetworkIsUp, final_result.Errors
+	// Block until the finalResultChan receives a value
+	finalResult := <-finalResultChan
+	return finalResult.NetworkIsUp, finalResult.Errors
 }
 
 // Run all checkUrl checks and transpose UrlStat responses into
 // the result/error channels
-func run_url_checks(
-	check_count_chan chan int,
-	result_chan chan bool,
-	error_chan chan error) {
+func runUrlChecks(
+	checkCountChan chan int,
+	resultChan chan bool,
+	errorChan chan error) {
 
 	checkUrlChan := make(chan UrlStat, 100)
 
 	// Launch checks
-	for _, url := range test_urls {
+	for _, url := range testUrls {
 		go checkUrl(url, checkUrlChan)
-		check_count_chan <- 1
+		checkCountChan <- 1
 	}
 
-	// Process results into the result_chan
+	// Process results into the resultChan
 	for {
 		stat := <-checkUrlChan
 		switch stat.Error {
 		case nil:
 			if stat.ResponseCode < 400 {
-				result_chan <- true
+				resultChan <- true
 			}
 		default:
-			error_chan <- stat.Error
+			errorChan <- stat.Error
 		}
 	}
 }
 
-// Collate errors and results from the result_chan and error_chan until the
-// timeout_chan fires. Once this occurs calculate the final result and
-// place it on the final_result_chan
-func final_result_check(
-	timeout_chan <-chan time.Time,
-	check_count_chan chan int,
-	result_chan chan bool,
-	error_chan chan error,
-	final_result_chan chan finalResult) {
+// Collate errors and results from the resultChan and errorChan until the
+// timeoutChan fires. Once this occurs calculate the final result and
+// place it on the finalResultChan
+func finalResultCheck(
+	timeoutChan <-chan time.Time,
+	checkCountChan chan int,
+	resultChan chan bool,
+	errorChan chan error,
+	finalResultChan chan finalResult) {
 
 	// Accumulators
-	var check_count int
-	var success_count int
-	var fail_count int
+	var checkCount int
+	var successCount int
+	var failCount int
 	var errors []error
 
 AccumulatorLoop:
 	for {
 		select {
-		case count := <-check_count_chan:
-			check_count += count
-		case result := <-result_chan:
+		case count := <-checkCountChan:
+			checkCount += count
+		case result := <-resultChan:
 			switch result {
 			case true:
-				success_count += 1
+				successCount += 1
 			default:
-				fail_count += 1
+				failCount += 1
 			}
 			// If all checks are in, break
-			if success_count+fail_count+len(errors) >= check_count {
+			if successCount+failCount+len(errors) >= checkCount {
 				break AccumulatorLoop
 			}
-		case err := <-error_chan:
+		case err := <-errorChan:
 			errors = append(errors, err)
 			// If all checks are in, break
-			if success_count+fail_count+len(errors) >= check_count {
+			if successCount+failCount+len(errors) >= checkCount {
 				break AccumulatorLoop
 			}
-		case <-timeout_chan:
+		case <-timeoutChan:
 			break AccumulatorLoop
 		}
 		debugLog(
 			DBG_VERBOSE,
-			"CheckCount = ", check_count, ";",
-			"SuccessCount =", success_count, ";",
-			"FailCount = ", fail_count, ";",
+			"CheckCount = ", checkCount, ";",
+			"SuccessCount =", successCount, ";",
+			"FailCount = ", failCount, ";",
 			"Errors = ", errors, ";",
 		)
 	}
@@ -151,10 +151,10 @@ AccumulatorLoop:
 	// Calculate the final result
 	switch errors {
 	case nil:
-		up_fraction := float32(success_count) / float32(check_count)
-		final_result_chan <- finalResult{up_fraction >= 0.5, nil}
+		upFraction := float32(successCount) / float32(checkCount)
+		finalResultChan <- finalResult{upFraction >= 0.5, nil}
 	default:
-		final_result_chan <- finalResult{false, errors}
+		finalResultChan <- finalResult{false, errors}
 	}
 }
 
@@ -162,32 +162,32 @@ AccumulatorLoop:
  * refactoring:
 
 	// Check results
-	test_count := len(test_urls)
-	var success_count int
-	var err_list []error
+	testCount := len(testUrls)
+	var successCount int
+	var errList []error
 	for _, stat := range stats {
 		debugLog(DBG_MEDIUM, stat)
 		switch stat.Error {
 		case nil:
 			if stat.ResponseCode < 400 {
-				success_count += 1
+				successCount += 1
 			}
 		default:
-			err_list = append(err_list, stat.Error)
+			errList = append(errList, stat.Error)
 		}
 	}
 
-	// Calculate network_is_up
-	up_fraction := float32(success_count) / float32(test_count)
-	var network_is_up bool
-	if up_fraction >= 0.5 {
-		network_is_up = true
+	// Calculate networkIsUp
+	upFraction := float32(successCount) / float32(testCount)
+	var networkIsUp bool
+	if upFraction >= 0.5 {
+		networkIsUp = true
 	}
-	debugLog(DBG_QUIET, "Sites up fraction:", up_fraction)
-	debugLog(DBG_QUIET, "Network is up:", network_is_up)
+	debugLog(DBG_QUIET, "Sites up fraction:", upFraction)
+	debugLog(DBG_QUIET, "Network is up:", networkIsUp)
 
-	// Return true if network_is_up
-	return network_is_up, err_list
+	// Return true if networkIsUp
+	return networkIsUp, errList
 }
 
 

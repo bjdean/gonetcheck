@@ -27,7 +27,7 @@ import (
 
 // A set of default test URLs used to check
 // remote network access
-var test_urls = []string{
+var testUrls = []string{
 	"http://www.google.com/",
 	"http://www.bing.com/",
 	"http://www.microsoft.com/",
@@ -41,23 +41,23 @@ var test_urls = []string{
 
 // Change the test URL list
 func GetUrlList() []string {
-	return test_urls
+	return testUrls
 }
 
 // Update the test URL list
 // Valide that the array of strings contains parseable URLs
-func SetUrlList(new_url_list []string) []error {
-	var err_list []error
-	for _, url_string := range new_url_list {
-		_, err := url.Parse(url_string)
+func SetUrlList(newUrlList []string) []error {
+	var errList []error
+	for _, urlString := range newUrlList {
+		_, err := url.Parse(urlString)
 		if err != nil {
-			err_list = append(err_list, err)
+			errList = append(errList, err)
 		}
 	}
-	if len(err_list) > 0 {
-		return err_list
+	if len(errList) > 0 {
+		return errList
 	} else {
-		test_urls = new_url_list
+		testUrls = newUrlList
 		return nil
 	}
 }
