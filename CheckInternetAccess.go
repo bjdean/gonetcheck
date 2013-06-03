@@ -28,7 +28,7 @@ import (
 // The final result to be put on the final_result_chan
 type finalResult struct {
 	NetworkIsUp bool
-	Errors []error
+	Errors      []error
 }
 
 // Determine if it looks like this server has access
@@ -121,17 +121,19 @@ AccumulatorLoop:
 			check_count += count
 		case result := <-result_chan:
 			switch result {
-				case true: success_count += 1
-				default: fail_count += 1
+			case true:
+				success_count += 1
+			default:
+				fail_count += 1
 			}
 			// If all checks are in, break
-			if success_count + fail_count + len(errors) >= check_count {
+			if success_count+fail_count+len(errors) >= check_count {
 				break AccumulatorLoop
 			}
 		case err := <-error_chan:
 			errors = append(errors, err)
 			// If all checks are in, break
-			if success_count + fail_count + len(errors) >= check_count {
+			if success_count+fail_count+len(errors) >= check_count {
 				break AccumulatorLoop
 			}
 		case <-timeout_chan:
@@ -150,9 +152,9 @@ AccumulatorLoop:
 	switch errors {
 	case nil:
 		up_fraction := float32(success_count) / float32(check_count)
-		final_result_chan <- finalResult{ up_fraction >= 0.5, nil }
+		final_result_chan <- finalResult{up_fraction >= 0.5, nil}
 	default:
-		final_result_chan <- finalResult{ false, errors }
+		final_result_chan <- finalResult{false, errors}
 	}
 }
 
