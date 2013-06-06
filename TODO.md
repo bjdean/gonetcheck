@@ -1,9 +1,11 @@
 github.com/bjdean/gonetcheck TODO
 =================================
 
-Wed May 29 14:13:24 EST 2013
-----------------------------
 * Extend CheckInternetAccess to do some other types of network checks (eg. DNS lookups, pings, other protcols)
+  Wed May 29 14:13:24 EST 2013
+
+* Add proxy support (for URL tests) by using http.ProxyFromEnvironment
+  Thu Jun  6 11:11:24 EST 2013
 
 DONE
 ====

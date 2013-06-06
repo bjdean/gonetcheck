@@ -1,7 +1,15 @@
 github.com/bjdean/gonetcheck
 ============================
 
-go package for checking general network health
+Go package for checking general network health
+
+The purpose of this package is to provide a simple yes/no check as to
+whether the general internet is directly accessible from the calling
+system.
+
+This could be used as a pre- or post-check when trying to connect to
+a different system (helping to determine that system is down, or if
+it is a local networking problem).
 
 Synopsis
 --------
