@@ -11,6 +11,8 @@ This could be used as a pre- or post-check when trying to connect to
 a different system (helping to determine that system is down, or if
 it is a local networking problem).
 
+See also: http://bjdean.id.au/wiki/Programming_Notes/GoLang
+
 Synopsis
 --------
 
