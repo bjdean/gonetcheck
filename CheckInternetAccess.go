@@ -33,10 +33,10 @@ type finalResult struct {
 
 // Determine if it looks like this server has access
 // to the internet (ie remote servers)
-func CheckInternetAccess(testUrls, testTcpAddrs []string) (bool, []error) {
+func CheckInternetAccess(timeout time.Duration, testUrls, testTcpAddrs []string) (bool, []error) {
 	// This entire function has a timeout starting
 	// when the function is called
-	timeoutChan := time.After(10 * time.Second)
+	timeoutChan := time.After(timeout)
 
 	// All checking goroutines:
 	// 1. Register thei existence (ie number of checks) by dropping an int

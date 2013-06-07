@@ -16,9 +16,15 @@ See also: http://bjdean.id.au/wiki/Programming_Notes/GoLang
 Synopsis
 --------
 
-	import "github.com/bjdean/gonetcheck"
+	import (
+		"github.com/bjdean/gonetcheck"
+		"time"
+	)
 	
-	canAccessInternet, err := gonetcheck.CheckInternetAccess()
+	canAccessInternet, err := gonetcheck.CheckInternetAccess(
+		time.Duration(10 * time.Second),
+		string[]{ "http://example.com", "http://example.net", "http://example.org/" },
+		string[]{ "example.org:80", "example.net:443", "example.org:22" } )
 	
 	if canAccessInternet {
 		// Do something requiring internet access
