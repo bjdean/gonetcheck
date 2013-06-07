@@ -13,6 +13,9 @@ it is a local networking problem).
 
 See also: http://bjdean.id.au/wiki/Programming_Notes/GoLang
 
+A simple wrapper program that uses this package can be found
+here: https://github.com/bjdean/can_access_internet
+
 Synopsis
 --------
 
