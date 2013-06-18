@@ -23,6 +23,7 @@ package gonetcheck
 
 import (
 	"time"
+	"fmt"
 )
 
 // The final result to be put on the finalResultChan
@@ -169,19 +170,28 @@ AccumulatorLoop:
 		}
 		debugLog(
 			DBG_VERBOSE,
-			"CheckCount = ", checkCount, ";",
+			"CheckCount =", checkCount, ";",
 			"SuccessCount =", successCount, ";",
-			"FailCount = ", failCount, ";",
-			"Errors = ", errors, ";",
+			"FailCount =", failCount, ";",
+			"Errors =", errors, ";",
 		)
 	}
 
 	// Calculate the final result
+	var result finalResult
 	switch errors {
 	case nil:
 		upFraction := float32(successCount) / float32(checkCount)
-		finalResultChan <- finalResult{upFraction >= 0.5, nil}
+		result.NetworkIsUp = upFraction >= 0.5
+		result.Errors = nil
 	default:
-		finalResultChan <- finalResult{false, errors}
+		result.NetworkIsUp = false
+		result.Errors = errors
 	}
+	debugLog(
+		DBG_VERBOSE,
+		"FinalResult =",
+		fmt.Sprintf("%+v", result),
+	)
+	finalResultChan <- result
 }
